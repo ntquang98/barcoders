@@ -21,12 +21,12 @@
 //!
 //! See the README for more examples.
 
-use std::io::Cursor;
 use crate::error::{Error, Result};
 use image::{
     DynamicImage::{self, ImageRgba8},
     ImageBuffer, ImageFormat, Rgba,
 };
+use std::io::Cursor;
 
 macro_rules! image_variants {
     ( $( #[$attr:meta] $v:ident ),* ) => {
@@ -102,7 +102,7 @@ impl Color {
         Color::new([255, 255, 255, 255])
     }
 
-    fn to_rgba(self) -> Rgba<u8> {
+    pub fn to_rgba(self) -> Rgba<u8> {
         Rgba(self.rgba)
     }
 }
@@ -180,6 +180,10 @@ impl Image {
         let img = self.place_pixels(&barcode);
 
         Ok(img.to_rgba8())
+    }
+
+    pub fn generate_dynamic_img<T: AsRef<[u8]>>(&self, barcode: T) -> DynamicImage {
+        self.place_pixels(&barcode)
     }
 
     fn place_pixels<T: AsRef<[u8]>>(&self, barcode: T) -> DynamicImage {
@@ -321,10 +325,10 @@ mod tests {
         let generated = webp.generate(&ean13.encode()[..]).unwrap();
 
         if WRITE_TO_FILE {
-           write_file(&generated[..], "ean13.webp");
-       }
+            write_file(&generated[..], "ean13.webp");
+        }
 
-       assert_eq!(generated.len(), 150);
+        assert_eq!(generated.len(), 150);
     }
 
     #[test]
